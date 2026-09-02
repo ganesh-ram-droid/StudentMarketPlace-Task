@@ -6,6 +6,17 @@ Students can create accounts, list products, browse products from other users, s
 
 ---
 
+## ⚙️ Environment Variables
+
+The backend requires the following environment variables:
+
+```env
+PORT=5000
+
+MONGO_URI=mongodb://localhost:27017/studentMarketPlace
+
+JWT_SECRET=your_jwt_secret
+
 ## 🚀 Features
 
 ### 👤 User Authentication
