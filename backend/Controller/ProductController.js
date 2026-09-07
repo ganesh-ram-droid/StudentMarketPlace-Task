@@ -1,4 +1,5 @@
 import Product from "../Model/Product.js";
+import mongoose from "mongoose";
 import { unlink } from "fs/promises";
 
 export const createProduct = async (req, res) => {
@@ -61,9 +62,10 @@ export const getProducts = async (req, res) => {
     const limit = parseInt(req.query.limit) || 8;
 
     const skip = (page - 1) * limit;
+    const currentUserId = new mongoose.Types.ObjectId(req.user);
 
     const filter = {
-      seller: { $ne: req.user },
+      seller: { $ne: currentUserId },
       status: { $ne: "sold" },
     };
 
@@ -110,6 +112,12 @@ export const getProductById = async (req, res) => {
       .populate("seller", "name phone");
 
     if (!product) {
+      return res.status(404).json({
+        message: "Product not found",
+      });
+    }
+
+    if (product.seller.toString() === req.user) {
       return res.status(404).json({
         message: "Product not found",
       });
