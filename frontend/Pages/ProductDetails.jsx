@@ -11,6 +11,7 @@ const ProductDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [buying, setBuying] = useState(false);
+  const [isOwnProduct, setIsOwnProduct] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -37,6 +38,17 @@ const ProductDetails = () => {
           );
         }
 
+        let currentUser = null;
+
+        try {
+          currentUser = JSON.parse(localStorage.getItem("user") || "null");
+        } catch {
+          currentUser = null;
+        }
+
+        setIsOwnProduct(
+          String(data.product.seller?._id) === String(currentUser?.id)
+        );
         setProduct(data.product);
       } catch (error) {
         setError(error.message);
@@ -213,17 +225,25 @@ Please contact me to arrange the handover.`;
               </p>
             </div>
 
-            <button
-              onClick={handleBuyNow}
-              disabled={buying}
-              className="mt-6 w-full rounded-2xl bg-green-600 py-4 text-sm font-bold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {buying ? "Placing order..." : "Buy Now on WhatsApp"}
-            </button>
+            {isOwnProduct ? (
+              <p className="mt-6 rounded-2xl bg-gray-100 py-4 text-center text-sm font-bold text-gray-600">
+                This is your product
+              </p>
+            ) : (
+              <>
+                <button
+                  onClick={handleBuyNow}
+                  disabled={buying}
+                  className="mt-6 w-full rounded-2xl bg-green-600 py-4 text-sm font-bold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {buying ? "Placing order..." : "Buy Now on WhatsApp"}
+                </button>
 
-            <p className="mt-3 text-center text-xs text-gray-400">
-              Your order details will be sent to the seller through WhatsApp.
-            </p>
+                <p className="mt-3 text-center text-xs text-gray-400">
+                  Your order details will be sent to the seller through WhatsApp.
+                </p>
+              </>
+            )}
           </div>
         </div>
       </main>

@@ -31,54 +31,38 @@ const Home = () => {
   const limit = 8;
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        setError("");
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      setError("");
 
-        const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:5000/api/products?page=${currentPage}&limit=${limit}&search=${encodeURIComponent(
+          search
+        )}&category=${encodeURIComponent(selectedCategory)}`
+      );
 
-        const params = new URLSearchParams({
-          page: currentPage,
-          limit,
-        });
+      const data = await response.json();
 
-        if (search.trim()) {
-          params.append("search", search.trim());
-        }
-
-        if (selectedCategory !== "All") {
-          params.append("category", selectedCategory);
-        }
-
-        const response = await fetch(
-          `http://localhost:5000/api/products?${params.toString()}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Failed to fetch products"
         );
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.message || "Failed to fetch products");
-        }
-
-        setProducts(data.products);
-        setTotalPages(data.totalPages);
-        setTotalProducts(data.totalProducts);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
       }
-    };
 
-    fetchProducts();
-  }, [currentPage, search, selectedCategory]);
+      setProducts(data.products || []);
+      setTotalPages(data.totalPages || 0);
+      setTotalProducts(data.totalProducts || 0);
 
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchProducts();
+}, [currentPage, search, selectedCategory]);
   const handleSearch = (e) => {
     setSearch(e.target.value);
     setCurrentPage(1);

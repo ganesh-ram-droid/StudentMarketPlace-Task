@@ -23,8 +23,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/purchases", purchaseRoutes);
 
-// Return a useful JSON response for Multer upload errors (invalid image type,
-// files over 5 MB, etc.) instead of Express's default 500 error page.
+
 app.use((error, req, res, next) => {
   if (error) {
     return res.status(400).json({
