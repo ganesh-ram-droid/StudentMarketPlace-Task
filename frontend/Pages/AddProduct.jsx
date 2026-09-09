@@ -14,22 +14,11 @@ const categories = [
 ];
 
 const AddProduct = () => {
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    image: "",
-    price: "",
-    category: "",
-  });
-
- 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [image, setImage] = useState("");
+  const [price, setPrice] = useState("");
+  const [category, setCategory] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,24 +28,20 @@ const AddProduct = () => {
         "http://localhost:3000/api/products",
         {
           method: "POST",
-
           headers: {
             "Content-Type": "application/json",
           },
-
           body: JSON.stringify({
-            title: formData.title,
-            description: formData.description,
-            image: formData.image,
-            price: Number(formData.price),
-            category: formData.category,
+            title,
+            description,
+            image,
+            price: Number(price),
+            category,
           }),
         }
       );
 
       const data = await response.json();
-
-      console.log(data);
 
       if (!response.ok) {
         alert(data.message);
@@ -65,17 +50,14 @@ const AddProduct = () => {
 
       alert("Product added successfully");
 
-      // Clear form
-      setFormData({
-        title: "",
-        description: "",
-        image: "",
-        price: "",
-        category: "",
-      });
+      setTitle("");
+      setDescription("");
+      setImage("");
+      setPrice("");
+      setCategory("");
 
     } catch (error) {
-      console.log("Error:", error);
+      console.log(error);
     }
   };
 
@@ -84,33 +66,25 @@ const AddProduct = () => {
       <h1>Add Product</h1>
 
       <form onSubmit={handleSubmit}>
-
         <div>
           <label>Title</label>
           <br />
-
           <input
             type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            placeholder="Enter product title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             required
           />
         </div>
 
         <br />
 
-        
         <div>
           <label>Description</label>
           <br />
-
           <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            placeholder="Enter description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             required
           />
         </div>
@@ -120,13 +94,10 @@ const AddProduct = () => {
         <div>
           <label>Image URL</label>
           <br />
-
           <input
             type="text"
-            name="image"
-            value={formData.image}
-            onChange={handleChange}
-            placeholder="Enter image URL"
+            value={image}
+            onChange={(e) => setImage(e.target.value)}
             required
           />
         </div>
@@ -136,13 +107,10 @@ const AddProduct = () => {
         <div>
           <label>Price</label>
           <br />
-
           <input
             type="number"
-            name="price"
-            value={formData.price}
-            onChange={handleChange}
-            placeholder="Enter price"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
             min="0"
             required
           />
@@ -153,11 +121,9 @@ const AddProduct = () => {
         <div>
           <label>Category</label>
           <br />
-
           <select
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
             required
           >
             <option value="">Select category</option>
@@ -175,7 +141,6 @@ const AddProduct = () => {
         <button type="submit">
           Add Product
         </button>
-
       </form>
     </div>
   );
