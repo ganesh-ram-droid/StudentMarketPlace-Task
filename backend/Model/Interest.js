@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const purchaseSchema = new mongoose.Schema(
+const interestSchema = new mongoose.Schema(
   {
     buyer: {
       type: mongoose.Schema.Types.ObjectId,
@@ -16,8 +16,8 @@ const purchaseSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["completed", "cancelled"],
-      default: "completed",
+      enum: ["interested", "cancelled"],
+      default: "interested",
     },
   },
   {
@@ -25,8 +25,9 @@ const purchaseSchema = new mongoose.Schema(
   }
 );
 
-purchaseSchema.index({ buyer: 1, product: 1 }, { unique: true });
+interestSchema.index({ buyer: 1, product: 1 }, { unique: true });
 
-const Purchase = mongoose.model("Purchase", purchaseSchema);
 
-export default Purchase;
+const Interest = mongoose.model("Interest", interestSchema, "purchases");
+
+export default Interest;

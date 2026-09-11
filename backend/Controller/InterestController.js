@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import Product from "../Model/Product.js";
-import Purchase from "../Model/Purchase.js";
+import Interest from "../Model/Interest.js";
 
 export const showInterest = async (req, res) => {
   try {
@@ -32,10 +32,10 @@ export const showInterest = async (req, res) => {
       });
     }
 
-    const existingInterest = await Purchase.findOne({
+    const existingInterest = await Interest.findOne({
       buyer: req.user,
       product: productId,
-      status: "completed",
+      status: { $in: ["interested", "completed"] },
     });
 
     if (existingInterest) {
@@ -45,10 +45,10 @@ export const showInterest = async (req, res) => {
       });
     }
 
-    const interest = await Purchase.create({
+    const interest = await Interest.create({
       buyer: req.user,
       product: productId,
-      status: "completed",
+      status: "interested",
     });
 
     res.status(201).json({
@@ -79,10 +79,10 @@ export const checkProductInterest = async (req, res) => {
       });
     }
 
-    const interest = await Purchase.findOne({
+    const interest = await Interest.findOne({
       buyer: req.user,
       product: productId,
-      status: "completed",
+      status: { $in: ["interested", "completed"] },
     });
 
     res.status(200).json({
@@ -99,9 +99,9 @@ export const checkProductInterest = async (req, res) => {
 
 export const getMyInterests = async (req, res) => {
   try {
-    const interests = await Purchase.find({
+    const interests = await Interest.find({
       buyer: req.user,
-      status: "completed",
+      status: { $in: ["interested", "completed"] },
     })
       .populate({
         path: "product",
@@ -133,7 +133,7 @@ export const deleteInterest = async (req, res) => {
       });
     }
 
-    const interest = await Purchase.findOne({
+    const interest = await Interest.findOne({
       _id: interestId,
       buyer: req.user,
     });
