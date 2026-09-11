@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Navbar from "../src/Components/NavBar";
 
 const categories = [
   "Books",
@@ -16,7 +17,7 @@ const categories = [
 const AddProduct = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState(null);
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
 
@@ -30,20 +31,27 @@ const AddProduct = () => {
       setLoading(true);
       setError("");
 
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        throw new Error("Please log in to publish a product");
+      }
+
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("description", description);
+      formData.append("image", image);
+      formData.append("price", price);
+      formData.append("category", category);
+
       const response = await fetch(
-        "http://localhost:3000/api/products",
+        "http://localhost:5000/api/products",
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            title,
-            description,
-            image,
-            price: Number(price),
-            category,
-          }),
+          body: formData,
         }
       );
 
@@ -70,6 +78,7 @@ const AddProduct = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Navbar/>
 
       <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
 
@@ -129,20 +138,19 @@ const AddProduct = () => {
 
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-700">
-                Image URL
+                Product Image
               </label>
 
               <input
-                type="text"
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
-                placeholder="https://example.com/image.jpg"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(e) => setImage(e.target.files?.[0] || null)}
                 required
                 className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100"
               />
 
               <p className="mt-2 text-xs text-gray-400">
-                Enter the URL of your product image.
+                Upload a JPG, JPEG, PNG, or WEBP image (maximum 5 MB).
               </p>
             </div>
 
