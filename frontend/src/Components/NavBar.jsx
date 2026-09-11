@@ -8,7 +8,7 @@ const Navbar = () => {
   try {
     user = JSON.parse(localStorage.getItem("user") || "null");
   } catch {
-    // A malformed stored user should not prevent navigation from rendering.
+    
     localStorage.removeItem("user");
   }
 
