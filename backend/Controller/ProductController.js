@@ -95,8 +95,7 @@ export const getProducts = async (req, res) => {
       currentPage: page,
       totalPages,
       totalProducts,
-      hasNextPage: page < totalPages,
-      hasPreviousPage: page > 1,
+
     });
   } catch (error) {
     res.status(500).json({
@@ -112,12 +111,6 @@ export const getProductById = async (req, res) => {
       .populate("seller", "name phone");
 
     if (!product) {
-      return res.status(404).json({
-        message: "Product not found",
-      });
-    }
-
-    if (product.seller.toString() === req.user) {
       return res.status(404).json({
         message: "Product not found",
       });
@@ -153,7 +146,7 @@ export const getMyProducts = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
   try {
-    const { title, description, price, image, category } = req.body;
+    const { title, description, price, category, status } = req.body;
 
     const product = await Product.findById(req.params.id);
 
@@ -169,11 +162,32 @@ export const updateProduct = async (req, res) => {
       });
     }
 
+    if (price !== undefined) {
+      const numericPrice = Number(price);
+
+      if (!Number.isFinite(numericPrice) || numericPrice < 0) {
+        return res.status(400).json({
+          message: "Price must be a valid non-negative number",
+        });
+      }
+
+      product.price = numericPrice;
+    }
+
+    if (status !== undefined && !["available", "sold"].includes(status)) {
+      return res.status(400).json({
+        message: "Status must be available or sold",
+      });
+    }
+
     product.title = title ?? product.title;
     product.description = description ?? product.description;
-    product.price = price ?? product.price;
-    product.image = image ?? product.image;
     product.category = category ?? product.category;
+    product.status = status ?? product.status;
+
+    if (req.file) {
+      product.image = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+    }
 
     await product.save();
 

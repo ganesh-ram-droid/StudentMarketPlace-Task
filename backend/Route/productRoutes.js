@@ -19,7 +19,7 @@ router.get("/my-products", authMiddleware, getMyProducts);
 router.get("/:id", authMiddleware, getProductById);
 
 router.post("/", authMiddleware, upload.single("image"), createProduct);
-router.put("/:id", authMiddleware, updateProduct);
+router.put("/:id", authMiddleware, upload.single("image"), updateProduct);
 router.patch("/:id/sold", authMiddleware, markProductAsSold);
 router.delete("/:id", authMiddleware, deleteProduct);
 

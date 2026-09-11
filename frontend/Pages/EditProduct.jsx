@@ -24,7 +24,10 @@ const EditProduct = () => {
     description: "",
     price: "",
     category: "",
+    status: "available",
   });
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -52,7 +55,9 @@ const EditProduct = () => {
           description: data.product.description,
           price: String(data.product.price),
           category: data.product.category,
+          status: data.product.status,
         });
+        setImagePreview(data.product.image);
       } catch (requestError) {
         setError(requestError.message);
       } finally {
@@ -70,6 +75,15 @@ const EditProduct = () => {
     }));
   };
 
+  const handleImageChange = (event) => {
+    const selectedFile = event.target.files?.[0] || null;
+    setImageFile(selectedFile);
+
+    if (selectedFile) {
+      setImagePreview(URL.createObjectURL(selectedFile));
+    }
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setSaving(true);
@@ -77,13 +91,23 @@ const EditProduct = () => {
 
     try {
       const token = localStorage.getItem("token");
+      const productData = new FormData();
+      productData.append("title", formData.title);
+      productData.append("description", formData.description);
+      productData.append("price", formData.price);
+      productData.append("category", formData.category);
+      productData.append("status", formData.status);
+
+      if (imageFile) {
+        productData.append("image", imageFile);
+      }
+
       const response = await fetch(`http://localhost:5000/api/products/${id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...formData, price: Number(formData.price) }),
+        body: productData,
       });
       const data = await response.json();
 
@@ -126,6 +150,24 @@ const EditProduct = () => {
                 <textarea name="description" value={formData.description} onChange={handleChange} rows="5" required className="w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100" />
               </div>
 
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">Product Image</label>
+                {imagePreview && (
+                  <img
+                    src={imagePreview}
+                    alt="Product preview"
+                    className="mb-3 h-48 w-full rounded-xl object-cover sm:w-64"
+                  />
+                )}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={handleImageChange}
+                  className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100"
+                />
+                <p className="mt-2 text-xs text-gray-400">Leave this empty to keep the current image.</p>
+              </div>
+
               <div className="grid gap-6 sm:grid-cols-2">
                 <div>
                   <label className="mb-2 block text-sm font-medium text-gray-700">Price</label>
@@ -136,6 +178,14 @@ const EditProduct = () => {
                   <label className="mb-2 block text-sm font-medium text-gray-700">Category</label>
                   <select name="category" value={formData.category} onChange={handleChange} required className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100">
                     {categories.map((category) => <option key={category} value={category}>{category}</option>)}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700">Availability</label>
+                  <select name="status" value={formData.status} onChange={handleChange} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100">
+                    <option value="available">Available</option>
+                    <option value="sold">Sold</option>
                   </select>
                 </div>
               </div>
