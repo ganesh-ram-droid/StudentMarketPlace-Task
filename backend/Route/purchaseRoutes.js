@@ -2,19 +2,19 @@ import express from "express";
 
 import authMiddleware from "../Middleware/authMiddleware.js";
 import {
-  buyProduct,
-  checkProductPurchase,
-  deletePurchase,
-  getMyPurchases,
-} from "../Controller/PurchaseController.js";
+  showInterest,
+  checkProductInterest,
+  deleteInterest,
+  getMyInterests,
+} from "../Controller/InterestController.js";
 
 const router = express.Router();
 
 router.use(authMiddleware);
 
-router.post("/:productId", buyProduct);
-router.get("/check/:productId", checkProductPurchase);
-router.get("/my-purchases", getMyPurchases);
-router.delete("/:purchaseId", deletePurchase);
+router.post("/:productId", showInterest);
+router.get("/check/:productId", checkProductInterest);
+router.get("/my-purchases", getMyInterests);
+router.delete("/:interestId", deleteInterest);
 
 export default router;

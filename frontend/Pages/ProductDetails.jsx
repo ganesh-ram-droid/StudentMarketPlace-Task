@@ -98,14 +98,14 @@ const ProductDetails = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Unable to place order");
+        throw new Error(data.message || "Unable to show interest in this product");
       }
 
-      const message = `New CampusMarket order
+      const message = `New CampusMarket product interest
 
 Product: ${product.title}
 Price: ₹${product.price}
-Order ID: ${data.purchase._id}
+Interest ID: ${data.interest._id}
 
 Buyer name: ${user.name || "Not provided"}
 Buyer email: ${user.email || "Not provided"}
@@ -236,11 +236,11 @@ Please contact me to arrange the handover.`;
                   disabled={buying}
                   className="mt-6 w-full rounded-2xl bg-green-600 py-4 text-sm font-bold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {buying ? "Placing order..." : "Buy Now on WhatsApp"}
+                  {buying ? "Showing interest..." : "Show Interest on WhatsApp"}
                 </button>
 
                 <p className="mt-3 text-center text-xs text-gray-400">
-                  Your order details will be sent to the seller through WhatsApp.
+                  Your interest details will be sent to the seller through WhatsApp.
                 </p>
               </>
             )}

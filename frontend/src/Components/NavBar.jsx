@@ -44,7 +44,7 @@ const Navbar = () => {
             to="/my-orders"
             className="text-sm font-medium text-gray-700 transition hover:text-green-600"
           >
-            My Orders
+            My Interests
           </Link>
 
           <Link

@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import Product from "../Model/Product.js";
 import Purchase from "../Model/Purchase.js";
 
-export const buyProduct = async (req, res) => {
+export const showInterest = async (req, res) => {
   try {
     const { productId } = req.params;
 
@@ -28,37 +28,37 @@ export const buyProduct = async (req, res) => {
 
     if (product.seller.toString() === req.user) {
       return res.status(400).json({
-        message: "You cannot buy your own product",
+        message: "You cannot show interest in your own product",
       });
     }
 
-    const existingPurchase = await Purchase.findOne({
+    const existingInterest = await Purchase.findOne({
       buyer: req.user,
       product: productId,
       status: "completed",
     });
 
-    if (existingPurchase) {
+    if (existingInterest) {
       return res.status(409).json({
-        message: "You have already bought this product",
-        purchase: existingPurchase,
+        message: "You have already shown interest in this product",
+        interest: existingInterest,
       });
     }
 
-    const purchase = await Purchase.create({
+    const interest = await Purchase.create({
       buyer: req.user,
       product: productId,
       status: "completed",
     });
 
     res.status(201).json({
-      message: "Product bought successfully",
-      purchase,
+      message: "Interest in the product recorded successfully",
+      interest,
     });
   } catch (error) {
     if (error.code === 11000) {
       return res.status(409).json({
-        message: "You have already bought this product",
+        message: "You have already shown interest in this product",
       });
     }
 
@@ -69,7 +69,7 @@ export const buyProduct = async (req, res) => {
   }
 };
 
-export const checkProductPurchase = async (req, res) => {
+export const checkProductInterest = async (req, res) => {
   try {
     const { productId } = req.params;
 
@@ -79,15 +79,15 @@ export const checkProductPurchase = async (req, res) => {
       });
     }
 
-    const purchase = await Purchase.findOne({
+    const interest = await Purchase.findOne({
       buyer: req.user,
       product: productId,
       status: "completed",
     });
 
     res.status(200).json({
-      hasBought: Boolean(purchase),
-      purchase: purchase || null,
+      hasShownInterest: Boolean(interest),
+      interest: interest || null,
     });
   } catch (error) {
     res.status(500).json({
@@ -97,9 +97,9 @@ export const checkProductPurchase = async (req, res) => {
   }
 };
 
-export const getMyPurchases = async (req, res) => {
+export const getMyInterests = async (req, res) => {
   try {
-    const purchases = await Purchase.find({
+    const interests = await Purchase.find({
       buyer: req.user,
       status: "completed",
     })
@@ -113,7 +113,7 @@ export const getMyPurchases = async (req, res) => {
       .sort({ createdAt: -1 });
 
     res.status(200).json({
-      purchases,
+      interests,
     });
   } catch (error) {
     res.status(500).json({
@@ -123,31 +123,31 @@ export const getMyPurchases = async (req, res) => {
   }
 };
 
-export const deletePurchase = async (req, res) => {
+export const deleteInterest = async (req, res) => {
   try {
-    const { purchaseId } = req.params;
+    const { interestId } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(purchaseId)) {
+    if (!mongoose.Types.ObjectId.isValid(interestId)) {
       return res.status(400).json({
-        message: "Invalid purchase id",
+        message: "Invalid interest id",
       });
     }
 
-    const purchase = await Purchase.findOne({
-      _id: purchaseId,
+    const interest = await Purchase.findOne({
+      _id: interestId,
       buyer: req.user,
     });
 
-    if (!purchase) {
+    if (!interest) {
       return res.status(404).json({
-        message: "Order not found",
+        message: "Interest not found",
       });
     }
 
-    await purchase.deleteOne();
+    await interest.deleteOne();
 
     res.status(200).json({
-      message: "Order deleted successfully",
+      message: "Interest removed successfully",
     });
   } catch (error) {
     res.status(500).json({
