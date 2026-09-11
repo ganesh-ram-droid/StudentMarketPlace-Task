@@ -69,34 +69,6 @@ export const showInterest = async (req, res) => {
   }
 };
 
-export const checkProductInterest = async (req, res) => {
-  try {
-    const { productId } = req.params;
-
-    if (!mongoose.Types.ObjectId.isValid(productId)) {
-      return res.status(400).json({
-        message: "Invalid product id",
-      });
-    }
-
-    const interest = await Interest.findOne({
-      buyer: req.user,
-      product: productId,
-      status: { $in: ["interested", "completed"] },
-    });
-
-    res.status(200).json({
-      hasShownInterest: Boolean(interest),
-      interest: interest || null,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
-    });
-  }
-};
-
 export const getMyInterests = async (req, res) => {
   try {
     const interests = await Interest.find({
